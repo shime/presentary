@@ -13,22 +13,16 @@
     <script src="js/app.js"></script>
     <link rel="stylesheet" type="text/css" href="style.css" media="all" />
 
-    <script>
-      function compile(template) {
-        var templateName = template.split('/templates/').reverse()[0].replace('.handlebars', '');
-        $.ajax({
-          url: template,
-          cache: false,
-          async: false,
-          success: function (source) {
-              var input = Ember.Handlebars.precompile(source.toString());
-              Ember.TEMPLATES[templateName] = Ember.Handlebars.template(input);
-          }
-        });
-      }
+    <script type='text/x-handlebars' data-template-name='application'>
+      {{outlet}}
 
-      compile('http://localhost:3000/js/templates/application.handlebars');
-      compile('http://localhost:3000/js/templates/slides/show.handlebars');
+    </script>
+
+    <script type='text/x-handlebars' data-template-name='slides/show'>
+      {{{ view.content }}}
+
+      <input id="fake" style="opacity: 0">
+      </input>
     </script>
 </head>
 <body>
