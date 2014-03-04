@@ -2,6 +2,6 @@
   "name": "my-bower-configuration",
   "version": "0.0.1",
   "dependencies": {
-    "ember": "*"
+    "ember": "1.0.0"
   }
 }
