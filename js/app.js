@@ -26,14 +26,10 @@ App.Slide = Ember.Object.extend({
   loadMarkdown: function(){
     var self = this;
     return Em.Deferred.promise(function(p){
-      if (self.get("content")) {
-        p.resolve(self.get("content"));
-      } else {
-        p.resolve(Em.$.get(self.get("location")).then(function(response){
-          self.set("content", response);
-          return response;
-        }));
-      }
+      p.resolve(Em.$.get(self.get("location")).then(function(response){
+        self.set("content", response);
+        return response;
+      }));
     });
   }
 });
@@ -43,7 +39,7 @@ App.Slide.reopenClass({
     var self = this;
     return Em.Deferred.promise(function(p){
       if (self.loadedSlides === true) {
-        p.resolve(self.loadedSlides);
+        p.resolve(self.slides);
       } else {
         p.resolve(Em.$.get("/slides.json").then(function(response){
           var slides = Em.A();
@@ -64,7 +60,7 @@ App.Slide.reopenClass({
 
   findById: function(id){
     return this.findAll().then(function(slides){
-      return slides.findProperty('id', id);
+      return slides.findBy('id', id);
     });
   }
 
@@ -75,7 +71,25 @@ App.SlidesRoute = Em.Route.extend({
     return App.Slide.findAll();
   },
   setupController: function(controller, slides) {
+    this._super(controller, slides);
     this.transitionTo("slides.show", slides.get("firstObject"));
+  },
+  actions: {
+    goLeft: function(){
+      var self = this;
+      var currentId = this.controllerFor("slides.show").get("model.id");
+      App.Slide.findById(currentId - 1).then(function(slide){
+        if (slide) self.transitionTo("slides.show", slide);
+      });
+    },
+    goRight: function(){
+      var self = this;
+      var currentId = this.controllerFor("slides.show").get("model.id");
+      App.Slide.findById(currentId + 1).then(function(slide){
+        if (slide) self.transitionTo("slides.show", slide);
+        
+      });
+    }
   }
 });
 
@@ -88,4 +102,26 @@ App.SlidesShowRoute = Em.Route.extend({
       return model;
     });
   }
+});
+
+App.SlidesShowView = Em.View.extend({
+  keyDown: function(e){
+    if (e.keyCode === 37){
+      this.get("controller").send("goLeft");
+    }
+    if (e.keyCode === 39){
+      this.get("controller").send("goRight");
+    }
+    return false;
+  },
+  didInsertElement: function(){
+    var self = this;
+    setInterval(function(){
+      self.$("#fake").focus();
+    }, 1);
+  },
+  content: function(){
+    var converter = new Markdown.Converter().makeHtml;
+    return converter(this.get("controller.model.content"));
+  }.property("controller.model.content")
 });
