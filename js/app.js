@@ -112,7 +112,6 @@ App.SlidesShowView = Em.View.extend({
     if (e.keyCode === 39){
       this.get("controller").send("goRight");
     }
-    return false;
   },
   didInsertElement: function(){
     var self = this;
