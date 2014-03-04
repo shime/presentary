@@ -23,6 +23,19 @@ App.ApplicationRoute = Em.Route.extend({
 })
 
 App.Slide = Ember.Object.extend({
+  loadMarkdown: function(){
+    var self = this;
+    return Em.Deferred.promise(function(p){
+      if (self.get("content")) {
+        p.resolve(self.get("content"));
+      } else {
+        p.resolve(Em.$.get(self.get("location")).then(function(response){
+          self.set("content", response);
+          return response;
+        }));
+      }
+    });
+  }
 });
 
 App.Slide.reopenClass({
@@ -36,7 +49,7 @@ App.Slide.reopenClass({
           var slides = Em.A();
           response.forEach(function(child){
             var slide = App.Slide.create({
-              title: child.title,
+              location: child.location,
               id: child.id
             });
             slides.pushObject(slide);
@@ -69,5 +82,10 @@ App.SlidesRoute = Em.Route.extend({
 App.SlidesShowRoute = Em.Route.extend({
   model: function(params){
     return App.Slide.findById(params.id);
+  },
+  afterModel: function(model){
+    return model.loadMarkdown().then(function(){
+      return model;
+    });
   }
 });

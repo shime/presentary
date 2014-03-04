@@ -1,4 +1,4 @@
 [
-  {"id": 1, "title": "slides/1.json"},
-  {"id": 2, "title": "slides/2.json"}
+  {"id": 1, "location": "slides/1.md"},
+  {"id": 2, "location": "slides/2.md"}
 ]
